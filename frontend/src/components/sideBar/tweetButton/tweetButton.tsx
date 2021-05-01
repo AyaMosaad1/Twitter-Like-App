@@ -1,4 +1,3 @@
-
 import React, { Component, Fragment } from "react";
 
 import "../../../App.css";
@@ -12,6 +11,7 @@ interface Button_info {
     disabled?: boolean;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
+
 export class TweetButton extends Component<Button_info> {
     render() {
         return (

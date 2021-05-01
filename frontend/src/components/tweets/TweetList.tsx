@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useQuery } from "@apollo/client";
 // import Tweet from '../Tweet';
@@ -14,51 +14,52 @@ export interface TweetFilter {
     filter: string;
     page: number;
     setPage: any;
+    id: string;
 }
 
 const TweetList: React.FC<TweetFilter> = (props) => {
-    let profile: any;
-    if (localStorage.getItem("token") !== null) {
-        profile = parseJwt(localStorage.getItem("token"));
-    }
-    const {filter, page, setPage} = props;
+
+    const { filter, page, setPage } = props;
     const sfw = useQuery(Get_SFW).data;
     const { loading, error, data, fetchMore } = useQuery(Tweets, {
         variables: {
-            userId: profile.id,
+            userId: props.id,
             filter: filter,
             isSFW: sfw.SFW.value,
         },
     });
-    if(!loading && data && data?.tweets?.tweets?.length === 10 && page === 1){
+    if (!loading && data && data?.tweets?.tweets?.length == 10 && page == 1) {
         setPage(page + 1);
         fetchMore({
             variables: {
-                userId: profile.id,
+                userId: props.id,
                 isSFW: sfw.SFW.value,
                 page: page + 1,
                 filter: filter
             },
         })
     }
-    if (loading) return <Loading />;
+    if (loading) return <Fragment><br /> <br /> <Loading size={30} /></Fragment>;
     if (error) return <p>`Error! ${error.message}`</p>;
 
     return (
         <InfiniteScroll
             dataLength={data?.tweets?.tweets?.length || 0}
             next={() => {
-                setPage(page + 1);
+                setPage(((data?.tweets?.tweets?.length || 10)/10) +1);
                 return fetchMore({
                     variables: {
-                        userId: profile.id,
+                        userId: props.id,
                         isSFW: sfw.SFW.value,
-                        page: page + 1,
+                        page: ((data?.tweets?.tweets?.length || 10)/10) +1,
                         filter: filter
                     },
                 });
             }}
-            hasMore={data?.tweets?.tweets?.length >= page * 10 || false}
+            style={{
+                overflow: "hidden"
+            }}
+            hasMore={data?.tweets?.totalCount > page * 10 || false}
             loader={<Loading />}
         >
             {data.tweets.tweets.map((tweet: TweetData) => {

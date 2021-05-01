@@ -1,18 +1,28 @@
 import './tweet.css';
 import avatar from "../../routes/mjv-d5z8_400x400.jpg";
+import { useHistory } from 'react-router';
 
 
-function Tweet_img(props:any){
+function Tweet_img(props: any) {
+  const history = useHistory();
 
-  return(
+  const goToProfile = () => {
+    history.push({
+      pathname: '/' + props.id,
+    })
+  }
+  return (
 
-   <a href ="/user_route" className="tweet-icon mr-2">
+    <p className="tweet-icon mr-2"
+      onClick={(e) => { goToProfile(); e.stopPropagation() }}>
+
       {props.imageURL ? (
         <img src={props.imageURL}
           alt="avatar" />
       ) : (<img src={avatar} alt="avatar" />)}
-    </a>
+    </p>
 
-  )}
+  )
+}
 
-export default Tweet_img ;
+export default Tweet_img;
